@@ -4,7 +4,7 @@ import { PrismaClient } from '@prisma/client/edge'
 import { withAccelerate } from '@prisma/extension-accelerate'
 import { validator } from 'hono/validator'
 import { decode, sign, verify } from 'hono/jwt'
-
+import { SignInInput, SignUpInput, signin, signup } from '@khalandar/medium-clone-common'
 
 export const userRouter = new Hono<{
     Bindings: {
@@ -16,16 +16,16 @@ export const userRouter = new Hono<{
   
 userRouter.post('/signup', async (c) => {
     console.log("khala signup");
-    validator('json', (value, c)=> {
-        console.log("khala validator");
-        console.log("value :", value);
-
-    })
+    const body = await c.req.json();
+    const { success } = signup.safeParse(body);
+    if (!success) {
+        c.status(400);
+        return c.text("Invalid SignUp data");
+    }
     const prisma = new PrismaClient({
         datasourceUrl: c.env.DATABASE_URL,
     }).$extends(withAccelerate())
 
-    const body = await c.req.json();
     try {
         const user = await prisma.user.create({
         data: {
@@ -51,7 +51,11 @@ userRouter.post('/signin', async (c) => {
     //middleware validation
 
     const body = await c.req.json();
-
+    const { success } = signin.safeParse(body);
+    if (!success) {
+        c.status(400);
+        return c.text("Invalid SignIn data");
+    }
     const prisma = new PrismaClient({
         datasourceUrl: c.env.DATABASE_URL,
     }).$extends(withAccelerate())

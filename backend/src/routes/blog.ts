@@ -4,7 +4,7 @@ import { PrismaClient } from '@prisma/client/edge'
 import { withAccelerate } from '@prisma/extension-accelerate'
 import { validator } from 'hono/validator'
 import { decode, sign, verify } from 'hono/jwt'
-
+import { CreateBlogPost, UpdateeBlogPost, createblogpost, updateblogpost } from '@khalandar/medium-clone-common'
 
 export const blogRouter = new Hono<{
     Bindings: {
@@ -40,12 +40,18 @@ blogRouter.use("/*", async (c, next) => {
 
 //Publish new blog post
 blogRouter.post('/', async (c)=> {
+
+    const body = await c.req.json();
+    const { success } = createblogpost.safeParse(body);
+    if (!success) {
+        c.status(400);
+        return c.text("Invalid SignUP data");
+    }
+
     const userId = c.get('userId');
     const prisma = new PrismaClient({
         datasourceUrl: c.env.DATABASE_URL,
     }).$extends(withAccelerate())
-
-    const body = await c.req.json();
     console.log("trying to create a blog");
     const post = await prisma.post.create({
         data: {
@@ -61,13 +67,17 @@ blogRouter.post('/', async (c)=> {
 
 //Edit existing blog post
 blogRouter.put('/', async (c)=> {
+    const body = await c.req.json();
+    const { success } = updateblogpost.safeParse(body);
+    if (!success) {
+        c.status(400);
+        return c.text("Invalid SignUP data");
+    }
+
     const userId = c.get('userId');
     const prisma = new PrismaClient({
         datasourceUrl: c.env.DATABASE_URL,
     }).$extends(withAccelerate())
-
-    const body = await c.req.json();
-
     try {
         const post = await prisma.post.update({
             where: {
