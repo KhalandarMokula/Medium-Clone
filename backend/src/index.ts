@@ -1,16 +1,90 @@
 import { Hono } from 'hono'
-
-const app = new Hono()
+import {User, Post} from '@prisma/client'
+import { PrismaClient } from '@prisma/client/edge'
+import { withAccelerate } from '@prisma/extension-accelerate'
+import { validator } from 'hono/validator'
+import { decode, sign, verify } from 'hono/jwt'
+//const zod = require("zod");
+/*
+ Note 1 : you cannot create prismaClient instance because the env is accesible only through 'context:c' in the routes, you hav eto define PrismaClient in each of the rotes 
+          respectively , or you can create it in a middleware which indeed is common to all the routes
+ Note 2 : you will notice an error depecting c.env is undefined, TypeScript is not able to recognize the env variables which are declared in wrangler.toml since .toml is specific to cloudflare 
+          In order for it to recognize, we have to explicitly declare it in the bindings of hono as defined below.
+*/
+const app = new Hono<{
+  Bindings: {
+    DATABASE_URL: string
+    SECRET_KEY : string
+  }
+}>()
 
 app.get('/', (c) => {
   return c.text('Hello Hono!')
 })
 
-app.post('/api/v1/user/signup', (c) => {
-  return c.text("sgnup route");
+app.post('/api/v1/user/signup', async (c) => {
+
+  console.log("khala signup");
+  validator('json', (value, c)=> {
+    console.log("khala validator");
+   console.log("value :", value);
+
+  })
+  const prisma = new PrismaClient({
+    datasourceUrl: c.env.DATABASE_URL,
+  }).$extends(withAccelerate())
+  
+  const body = await c.req.json();
+  try {
+    const user = await prisma.user.create({
+      data: {
+        email : body.email,
+        name : body.name,
+        password : body.password
+      }
+    });
+
+    //creating a jwt 
+    const jwt = await sign({
+      "id" : user.id,
+    }, c.env.SECRET_KEY);
+
+    return c.json({"token": jwt});
+  } catch(e) {
+     c.text("error in signing up");
+  }
+
 })
 
-app.post('/api/v1/user/signin', (c) => {
+app.post('/api/v1/user/signin', async (c) => {
+
+  //middleware validation
+
+  const body = await c.req.json();
+
+  const prisma = new PrismaClient({
+    datasourceUrl: c.env.DATABASE_URL,
+  }).$extends(withAccelerate())
+
+  try {
+    const user = await prisma.user.findFirst({
+      where: {
+        email : body.email,
+        password : body.password,
+      }
+    })
+    if (!user) {
+      c.status(403)
+      return c.text("Invalid login credentials");
+    }
+    const jwt = await sign({
+      "id" : user.id,
+    }, c.env.SECRET_KEY);
+    return c.json({"token": jwt});
+  } catch(e) {
+
+  }
+  const decodedPayload  = await verify(body["jwt"], c.env.SECRET_KEY);
   return c.text("signIn route");
 })
 
