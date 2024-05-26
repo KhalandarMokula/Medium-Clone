@@ -31,3 +31,6 @@ Step 3 : Get connection pool URL from Prisma accelerate - prisma://accelerate.pr
 Step 4 : Initilized prisma in the project 
   1. npm i prisma
   2. npx prisma init - You will see a folder named prisma is created after this step.
+
+
+To Do : Update complete development process
