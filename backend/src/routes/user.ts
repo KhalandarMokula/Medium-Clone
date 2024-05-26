@@ -27,6 +27,7 @@ userRouter.post('/signup', async (c) => {
     }).$extends(withAccelerate())
 
     try {
+        console.log("entry to db");
         const user = await prisma.user.create({
         data: {
             email : body.email,
@@ -34,15 +35,16 @@ userRouter.post('/signup', async (c) => {
             password : body.password
         }
         });
-
+        console.log("creating a jwt ");
         //creating a jwt 
         const jwt = await sign({
         "id" : user.id,
         }, c.env.SECRET_KEY);
-
-        return c.json({"token": jwt});
+        console.log("returning json");
+        return c.json({"token": jwt, "name": user.name});
     } catch(e) {
-        c.text("error in signing up");
+        console.log("khala");
+        return c.text("error in signing up");
     }
 })
 
@@ -65,6 +67,9 @@ userRouter.post('/signin', async (c) => {
             where: {
                 email : body.email,
                 password : body.password,
+            }, select :{
+                name:true,
+                id: true,
             }
         })
         if (!user) {
@@ -74,7 +79,7 @@ userRouter.post('/signin', async (c) => {
         const jwt = await sign({
             "id" : user.id,
             }, c.env.SECRET_KEY);
-        return c.json({"token": jwt});
+        return c.json({"token": jwt, "name": user.name});
     } catch(e) {
 
     }

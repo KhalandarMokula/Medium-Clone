@@ -38,7 +38,7 @@ export const Blog = ()=> {
         console.log(selectedTabPanel?.classList);
         selectedTabPanel?.classList.remove('hidden');
     }
-    return <LoadingView/>
+    
     return (
         <>
          

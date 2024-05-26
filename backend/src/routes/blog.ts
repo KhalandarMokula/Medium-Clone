@@ -22,7 +22,7 @@ blogRouter.use("/*", async (c, next) => {
      
     try {
         console.log("khalandar 1 authorizationToken", authorizationToken);
-        const verifyResult = await verify(authorizationToken.slice(7), c.env.SECRET_KEY);
+        const verifyResult = await verify(authorizationToken, c.env.SECRET_KEY);
         console.log("khalandar 2");
         if (verifyResult) {
             c.set('userId', verifyResult.id);
@@ -103,14 +103,28 @@ To resolve this issue, you can reorder the route definitions so that more specif
 */
 //fetch all posts
 blogRouter.get('/bulk', async (c) => {
+    console.log("khalandar bulk");
     const userId = c.get('userId');
+    console.log("khalandar bulk 1");
     const prisma = new PrismaClient({
         datasourceUrl: c.env.DATABASE_URL,
     }).$extends(withAccelerate())
-
-    const body = await c.req.json();
+    console.log("khalandar bulk 2");
+    //const body = await c.req.json();
+    console.log("khalandar bulk 3");
     try {
-        const posts = await prisma.post.findMany({})
+        const posts = await prisma.post.findMany({
+            select : {
+                content : true,
+                title : true,
+                id : true,
+                user : {
+                    select: {
+                        name : true,
+                    }
+                }
+            }
+        })
         return c.json({"posts": posts});
     } catch(e) {
         c.status(403);
@@ -133,6 +147,16 @@ blogRouter.get('/:id', async (c)=> {
             where: {
                 id : postId,
             },
+            select: {
+                id: true,
+                title : true,
+                content : true,
+                user :{
+                    select: {
+                        name : true,
+                    }
+                } 
+            }
         })
         return c.json({"posts": post});
     } catch(e) {

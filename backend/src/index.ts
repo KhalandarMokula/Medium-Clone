@@ -6,7 +6,7 @@ import { validator } from 'hono/validator'
 import { decode, sign, verify } from 'hono/jwt'
 import { userRouter } from './routes/user'
 import { blogRouter } from './routes/blog'
-
+import { cors } from 'hono/cors'
 /*
  Note 1 : you cannot create prismaClient instance because the env is accesible only through 'context:c' in the routes, you hav eto define PrismaClient in each of the rotes 
           respectively , or you can create it in a middleware which indeed is common to all the routes
@@ -19,6 +19,8 @@ const app = new Hono<{
     SECRET_KEY : string
   }
 }>()
+
+app.use('/*', cors())
 
 app.get('/', (c) => {
   return c.text('Hello Hono!')
