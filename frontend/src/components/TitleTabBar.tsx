@@ -1,5 +1,4 @@
-import { Link, useLocation } from "react-router-dom"
-import mediumLogo from '../assets/mediumLogo.jpg';
+import { Link } from "react-router-dom"
 
 export const TitleBar = ({name} : {name: string})=> {
    

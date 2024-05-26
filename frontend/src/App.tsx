@@ -1,6 +1,4 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { SignUp } from './pages/SignUp'
@@ -10,7 +8,6 @@ import { BlogPost } from './pages/BlogPost'
 import { WriteBlog } from './pages/WriteBlog'
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <>
