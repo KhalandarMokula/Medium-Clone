@@ -1,23 +1,14 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { BlogCard } from "../components/BlogCard";
 import { useBlogs } from "../hooks";
 import { TitleBar } from "../components/TitleTabBar";
 import { LoadingView } from "../components/LoadingView";
 
-export interface BlogCardProps {
-    authorname : string
-    date : string //can be a datetime object
-    memberOnlyAccess : boolean
-    title : string
-    content : string
-    id: string
-}
 
 export const Blog = ()=> {
 
     const {loading, blogs} = useBlogs();
     const navigate = useNavigate();
-    const location = useLocation();
     const userName = localStorage.getItem("username") || "";
     
     if (loading) {

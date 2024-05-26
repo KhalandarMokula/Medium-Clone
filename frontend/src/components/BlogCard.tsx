@@ -1,5 +1,13 @@
 import { Link } from "react-router-dom";
-import { BlogCardProps } from "../pages/Blog";
+
+export interface BlogCardProps {
+    authorname : string
+    date : string //can be a datetime object
+    memberOnlyAccess : boolean
+    title : string
+    content : string
+    id: string
+}
 
 export const BlogCard = (blogsProps:BlogCardProps)=> {
     return (

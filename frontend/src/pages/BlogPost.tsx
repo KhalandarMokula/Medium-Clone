@@ -1,6 +1,5 @@
-    import { useLocation, useParams } from "react-router-dom";
-    import { BlogPostStruct, useBlog } from "../hooks";
-    import { BlogCardProps } from "./Blog";
+import { useParams } from "react-router-dom";
+import { BlogPostStruct, useBlog } from "../hooks";
 import { TitleBar } from "../components/TitleTabBar";
 import { LoadingView } from "../components/LoadingView";
 
@@ -14,7 +13,6 @@ import { LoadingView } from "../components/LoadingView";
         if (loading) {
             return <LoadingView/>
         } 
-        const post = blog?.content;
         return (
             <div className="ml-20 mr-20">
                  <TitleBar name={userName}></TitleBar>
