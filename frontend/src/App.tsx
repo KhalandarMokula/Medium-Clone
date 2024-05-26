@@ -14,7 +14,6 @@ function App() {
 
   return (
     <>
-    <div> Khalandar</div>
       <BrowserRouter>
         <Routes>
           <Route path="/signup" element={<SignUp />} />

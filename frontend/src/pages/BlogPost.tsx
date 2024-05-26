@@ -12,7 +12,7 @@ import { LoadingView } from "../components/LoadingView";
         const {loading, blog} = useBlog({id : id  || ""});
         console.log("blog post data : ", blog);
         if (loading) {
-            return <LoadingView className="flex w-full m-20"/>
+            return <LoadingView/>
         } 
         const post = blog?.content;
         return (
